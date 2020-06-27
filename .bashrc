@@ -527,6 +527,7 @@
     alias howdoi='howdoi -c'
     alias pls='sudo $(fc -ln -1)'
     alias neofetch="neofetch --ascii_bold off"
+    alias vi="vim"
   #}}}
   # PRIVILEGED ACCESS {{{
     if ! $_isroot; then
