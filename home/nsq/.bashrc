@@ -70,9 +70,9 @@ if ${use_color} ; then
 	fi
 
 	if [[ ${EUID} == 0 ]] ; then
-		PS1='\[\033[01;31m\][\h\[\033[01;36m\] \W\[\033[01;31m\]]\$\[\033[00m\] '
+		PS1='\[$(tput setaf 6)$(tput bold)\][\u@\h\[\033[01;37m\] \W\[$(tput setaf 6)$(tput bold)\]]\$\[\033[00m\] '
 	else
-		PS1='\[$(tput setaf 35)$(tput bold)\][\u@\h\[\033[01;36m\] \W\[$(tput setaf 35)$(tput bold)\]]\$\[\033[00m\] '
+		PS1='\[$(tput setaf 6)$(tput bold)\][\u@\h\[\033[01;37m\] \W\[$(tput setaf 6)$(tput bold)\]]\$\[\033[00m\] '
 	fi
 
 	alias ls='ls --color=auto'
@@ -662,11 +662,11 @@ ex ()
     alias more='less'
     alias nano='nano -w'
     alias ping='ping -c 5'
-    alias cls='clear'
+    alias cls='clear; neofetch'
     alias pacman='sudo pacman'
     alias howdoi='howdoi -c'
     alias pls='sudo $(fc -ln -1)'
-    alias neofetch="neofetch --ascii_colors 35 --colors 35 36 42 6 35 35"
+    alias neofetch="neofetch --colors 6 6 6 6 6 6"
     alias vi="vim"
   #}}}
   # PRIVILEGED ACCESS {{{
@@ -715,12 +715,13 @@ ex ()
   #}}}
 #}}}
 # STARTUP {{{
-  if [ "$COLORTERM" != "rxvt" ]; then
-  	powerline-daemon -q
-  	POWERLINE_BASH_CONTINUATION=1
-  	POWERLINE_BASH_SELECT=1
-  	. /usr/share/powerline/bindings/bash/powerline.sh
-  	alias neofetch="neofetch --ascii_colors 35 --colors 35 36 42 2 35 35"
+  if [[ "$COLORTERM" == "truecolor" ]]
+  	  then
+
+		  powerline-daemon -q
+		  POWERLINE_BASH_CONTINUATION=1
+		  POWERLINE_BASH_SELECT=1
+		  . /usr/share/powerline/bindings/bash/powerline.sh
   fi
   neofetch
 #}}}

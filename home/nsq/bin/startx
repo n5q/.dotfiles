@@ -1,0 +1,30 @@
+echo "Xorg X Server 1.20.8
+X Protocol Version 11, Revision 0
+Build Operating System: Linux Arch Linux
+Current Operating System: Linux arch 5.7.12-arch1-1 #1 SMP PREEMPT Fri, 31 Jul 2020 17:38:22 +0000 x86_64
+Kernel command line: BOOT_IMAGE=/boot/vmlinuz-linux root=UUID=9f401227-eb64-441e-a855-d628a11437cb rw loglevel=3
+Build Date: 31 July 2020  04:00:57PM
+
+Current version of pixman: 0.40.0
+        Before reporting problems, check http://wiki.x.org
+        to make sure that you have the latest version.
+Markers: (--) probed, (**) from config file, (==) default setting,
+        (++) from command line, (!!) notice, (II) informational,
+        (WW) warning, (EE) error, (NI) not implemented, (??) unknown.
+(==) Log file: "/home/nsq/.local/share/xorg/Xorg.0.log", Time: Thu Aug  6 19:25:03 2020
+(==) Using system config directory "/usr/share/X11/xorg.conf.d"
+xf86EnableIOPorts: failed to set IOPL for I/O (Operation not permitted)
+                                                                       /etc/X11/xinit/xinitrc: line 51: twm: command not found
+                                                                                                                              /etc/X11/xinit/xinitrc: line 52: xclock: command not found
+                                                                                                                                                                                        xterm: cannot load font "-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso10646-1"
+                                  xterm: cannot load font "-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso10646-1"
+                                                                                                                            xterm: cannot load font "-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso10646-1"
+                                                                                                                                                                                                                      xinit: connection to X server lost
+
+waiting for X server to shut down xterm: fatal IO error 11 (Resource temporarily unavailable) or KillClient on X server ":0"
+xterm: fatal IO error 11 (Resource temporarily unavailable) or KillClient on X server ":0"
+(II) Server terminated successfully (0). Closing log file."
+
+sudo systemctl stop gpm
+sudo systemctl start gdm
+
