@@ -45,12 +45,7 @@ esac
 
 use_color=true
 
-# Set colorful PS1 only on colorful terminals.
-# dircolors --print-database uses its own built-in database
-# instead of using /etc/DIR_COLORS.  Try to use the external file
-# first to take advantage of user additions.  Use internal bash
-# globbing instead of external grep binary.
-safe_term=${TERM//[^[:alnum:]]/?}   # sanitize TERM
+safe_term=${TERM//[^[:alnum:]]/?}  
 match_lhs=""
 [[ -f ~/.dir_colors   ]] && match_lhs="${match_lhs}$(<~/.dir_colors)"
 [[ -f /etc/DIR_COLORS ]] && match_lhs="${match_lhs}$(</etc/DIR_COLORS)"
@@ -60,7 +55,6 @@ match_lhs=""
 [[ $'\n'${match_lhs} == *$'\n'"TERM "${safe_term}* ]] && use_color=true
 
 if ${use_color} ; then
-	# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
 	if type -P dircolors >/dev/null ; then
 		if [[ -f ~/.dir_colors ]] ; then
 			eval $(dircolors -b ~/.dir_colors)
@@ -81,7 +75,6 @@ if ${use_color} ; then
 	alias fgrep='fgrep --colour=auto'
 else
 	if [[ ${EUID} == 0 ]] ; then
-		# show root@ when we don't have colors
 		PS1='\u@\h \W \$ '
 	else
 		PS1='\u@\h \w \$ '
@@ -90,7 +83,7 @@ fi
 
 unset use_color safe_term match_lhs sh
 
-alias cp="cp -i"                          # confirm before overwriting something
+alias cp="cp -iv"                          # confirm before overwriting something
 alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
@@ -99,19 +92,25 @@ alias more=less
 xhost +local:root > /dev/null 2>&1
 
 complete -cf sudo
-
-# Bash won't get SIGWINCH if another process is in the foreground.
-# Enable checkwinsize so that bash will check the terminal size when
-# it regains control.  #65623
-# http://cnswww.cns.cwru.edu/~chet/bash/FAQ (E11)
+source /usr/share/doc/pkgfile/command-not-found.bash
+shopt -s autocd
+source /etc/profile.d/autojump.bash
 shopt -s checkwinsize
 
 shopt -s expand_aliases
 
 # export QT_SELECT=4
 
-# Enable history appending instead of overwriting.  #139609
 shopt -s histappend
+
+export LESS=-R
+export LESS_TERMCAP_mb=$'\E[1;31m'     # begin blink
+export LESS_TERMCAP_md=$'\E[1;36m'     # begin bold
+export LESS_TERMCAP_me=$'\E[0m'        # reset bold/blink
+export LESS_TERMCAP_so=$'\E[01;44;33m' # begin reverse video
+export LESS_TERMCAP_se=$'\E[0m'        # reset reverse video
+export LESS_TERMCAP_us=$'\E[1;32m'     # begin underline
+export LESS_TERMCAP_ue=$'\E[0m'        # reset underline
 
 #
 # # ex - archive extractor
@@ -140,12 +139,12 @@ ex ()
 
 
 # BASH OPTIONS {{{
-  shopt -s cdspell                 # Correct cd typos
-  shopt -s checkwinsize            # Update windows size on command
-  shopt -s histappend              # Append History instead of overwriting file
-  shopt -s cmdhist                 # Bash attempts to save all lines of a multiple-line command in the same history entry
-  shopt -s extglob                 # Extended pattern
-  shopt -s no_empty_cmd_completion # No empty completion
+  shopt -s cdspell
+  shopt -s checkwinsize
+  shopt -s histappend 
+  shopt -s cmdhist   
+  shopt -s extglob  
+  shopt -s no_empty_cmd_completion
   # COMPLETION {{{
     complete -cf sudo
     if [[ -f /etc/bash_completion ]]; then
@@ -158,29 +157,16 @@ ex ()
   if [[ -d "$HOME/bin" ]] ; then
       PATH="$HOME/bin:$PATH"
   fi
-  # CHROME {{{
-    if which google-chrome-stable &>/dev/null; then
-      export CHROME_BIN=/usr/bin/google-chrome-stable
-    fi
-  #}}}
   # EDITOR {{{
-    if which vim &>/dev/null; then
-      export EDITOR="vim"
-    elif which emacs &>/dev/null; then
-      export EDITOR="emacs -nw"
-    else
-      export EDITOR="nano"
-    fi
+    export EDITOR="vim"
   #}}}
   # BASH HISTORY {{{
-    # make multiple shells share the same history file
-    export HISTSIZE=100000            # bash history will save N commands
-    export HISTFILESIZE=${HISTSIZE} # bash will remember N commands
-    export HISTCONTROL=ignoreboth   # ingore duplicates and spaces
-    export HISTIGNORE='&:ls:ll:la:cd:exit:clear:history:neofetch'
+    export HISTSIZE=100000 
+    export HISTFILESIZE=${HISTSIZE}
+    export HISTCONTROL=ignoreboth 
+    export HISTIGNORE='&:ls:ll:la:cd:exit:clear:history:neofetch:cls:startx:startgdm'
   #}}}
   # COLORED MAN PAGES {{{
-    # For colourful man pages (CLUG-Wiki style)
     if $_isxrunning; then
       export PAGER=less
       export LESS_TERMCAP_mb=$'\E[01;31m'       # begin blinking
@@ -193,7 +179,8 @@ ex ()
     fi
   #}}}
 #}}}
-# FUNCTIONS {{{
+
+
   # BETTER GIT COMMANDS {{{
     bit() {
       # By helmuthdu
@@ -668,6 +655,10 @@ ex ()
     alias pls='sudo $(fc -ln -1)'
     alias neofetch="neofetch --colors 6 6 6 6 6 6"
     alias vi="vim"
+    alias diskspace="du -S | sort -n -r | less"
+    alias folders="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
+    alias rmlck="sudo rm -rv /var/lib/pacman/db.lck"
+    alias htop="htop -t"
   #}}}
   # PRIVILEGED ACCESS {{{
     if ! $_isroot; then
@@ -715,6 +706,15 @@ ex ()
   #}}}
 #}}}
 # STARTUP {{{
+
+if [ "$TERM" = "linux" ]; then
+    _SEDCMD='s/.*\*color\([0-9]\{1,\}\).*#\([0-9a-fA-F]\{6\}\).*/\1 \2/p'
+    for i in $(sed -n "$_SEDCMD" /home/nsq/.Xresources | awk '$1 < 16 {printf "\\e]P%X%s", $1, $2}'); do
+        echo -en "$i"
+    done
+fi
+
+
   if [[ "$COLORTERM" == "truecolor" ]]
   	  then
 
@@ -723,5 +723,8 @@ ex ()
 		  POWERLINE_BASH_SELECT=1
 		  . /usr/share/powerline/bindings/bash/powerline.sh
   fi
+  alias pacman=yay
   neofetch
 #}}}
+
+source .ombrc
